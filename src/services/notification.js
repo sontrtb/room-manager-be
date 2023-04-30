@@ -1,4 +1,37 @@
 const db = require("../models")
+const admin = require("../firebase")
+
+
+const create = (req) => new Promise(async (resolve, reject) => {
+    try {
+        
+
+        const message = {
+            data: {
+              score: '850',
+              time: '2:45'
+            },
+            notification: {
+                title: "Có thông báo mới",
+                body: "hello sas ds ds s sd sd sd",
+            },
+            topic: process.env.TOPIC
+          };
+          
+    
+        const messagingFirebase = await admin.messaging().send(message)
+
+        console.log("messagingFirebase", messagingFirebase)
+    
+        resolve({
+            erroCode: 0,
+            mess: "Thông báo thành công",
+        })
+    } catch (error) {
+        console.log("err", error)
+        reject(error)
+    }
+})
 
 const getAll = () => new Promise(async (resolve, reject) => {
     try {
@@ -21,38 +54,6 @@ const getAll = () => new Promise(async (resolve, reject) => {
         })
     } catch (error) {
         console.log("err", error)
-        reject(error)
-    }
-})
-
-const create = (req) => new Promise(async (resolve, reject) => {
-    const {categoryId, type, amountMoney, content, price} = req.body;
-    const userId = req.user.id;
-
-    try {
-        const fluctuationInsert = await db.Fluctuation.create({
-            type: type,
-            amountMoney: amountMoney,
-            categoryId: categoryId,
-            content: content,
-            userId: userId,
-            price: price
-        })
-
-        const total = await db.Total.findByPk(1);
-        if(type == 0) {
-            total.total -= Number(amountMoney)
-        } else {
-            total.total += Number(amountMoney)
-        }
-        await total.save();
-
-        resolve({
-            erroCode: 0,
-            mess: "Khai báo thành công",
-            data: fluctuationInsert
-        })
-    } catch (error) {
         reject(error)
     }
 })

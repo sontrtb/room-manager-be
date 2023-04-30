@@ -24,6 +24,14 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+
+    return queryInterface.bulkInsert('Categories', [{
+      name: 'Khác...',
+      price: 0,
+      password: hashPassword("Admin@123"),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }]);
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Categories');

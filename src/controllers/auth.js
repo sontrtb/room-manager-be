@@ -25,6 +25,8 @@ const login = async (req, res) => {
             errCode: 1,
             mess: "Tài khoản hoặc mật khẩu không hợp lệ"
         })
+
+        console.log("req", req.body)
     
         const response = await auth.login(req.body)
         return res.status(200).json(response)

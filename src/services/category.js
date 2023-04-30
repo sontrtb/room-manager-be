@@ -3,6 +3,7 @@ const db = require("../models")
 const getAll = () => new Promise(async (resolve, reject) => {
     try {
         const category = await db.Category.findAll({
+            order: [ [ 'createdAt', 'DESC' ]],
             attributes: ["id", "name", "price"]
         });
         resolve({
@@ -15,25 +16,16 @@ const getAll = () => new Promise(async (resolve, reject) => {
     }
 })
 
-const create = ({name}) => new Promise(async (resolve, reject) => {
+const create = ({name, price}) => new Promise(async (resolve, reject) => {
+    console.log("price", price)
     try {
-        const [category, created] = await db.Category.findOrCreate({
-            where: { name },
-            default: { name }
+        const category = await db.Category.create({ name: name , price: price})
+        resolve({
+            erroCode: 0,
+            mess: "Thêm danh mục thành công",
+            data: category
         })
-
-        if(!created) {
-            resolve({
-                erroCode: 1,
-                mess: "Danh mục đã tồn tại"
-            })
-          } else {
-            resolve({
-                erroCode: 0,
-                mess: "Thêm danh mục thành công",
-                data: category
-            })
-          }
+         
 
     } catch (error) {
         reject(error)

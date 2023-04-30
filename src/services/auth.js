@@ -1,6 +1,7 @@
 const db = require("../models")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const admin = require("../firebase")
 
 const saltRounds = 10;
 const timeToken  = '30d'
@@ -54,20 +55,25 @@ const register = ({name, userName, password}) => new Promise(async (resolve, rej
     }
 })
 
-const login = ({userName, password}) => new Promise(async (resolve, reject) => {
+const login = ({userName, password, deviceToken}) => new Promise(async (resolve, reject) => {
     try {
         const user = await db.User.findOne({
             where: { userName },
             raw: true
-          });
+        });
+
         
-          if(user === null) {
+        if(user === null) {
             resolve({
                 erroCode: 1,
                 mess: "Tài khoản không tồn tại"
             })
-          } else {
+        } else {
             const checkPassword = comparePassword(password, user.password)
+            if(checkPassword) {
+                const registrationToTopic = await admin.messaging().subscribeToTopic([deviceToken], process.env.TOPIC)
+                console.log("Successfully subscribed to topic: ", registrationToTopic)
+            }
             resolve({
                 erroCode: checkPassword ? 0 : 1,
                 mess: checkPassword ? "Đăng nhập thành công" : "Sai mật khẩu",
@@ -77,7 +83,7 @@ const login = ({userName, password}) => new Promise(async (resolve, reject) => {
                     role: user.role,
                 } : undefined
             })
-          }
+        }
     } catch (error) {
         reject(error)
     }
