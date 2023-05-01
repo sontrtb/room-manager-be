@@ -9,6 +9,9 @@ const register = async (req, res) => {
         })
     
         const response = await auth.register(req.body)
+        if(response.erroCode === 1) {
+            return res.status(400).json(response)
+        }
         return res.status(200).json(response)
     } catch (error) {
         return res.status(500).json({
@@ -25,10 +28,11 @@ const login = async (req, res) => {
             errCode: 1,
             mess: "Tài khoản hoặc mật khẩu không hợp lệ"
         })
-
-        console.log("req", req.body)
     
         const response = await auth.login(req.body)
+        if(response.erroCode === 1) {
+            return res.status(400).json(response)
+        }
         return res.status(200).json(response)
     } catch (error) {
         return res.status(500).json({
