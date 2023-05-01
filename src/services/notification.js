@@ -1,31 +1,41 @@
 const db = require("../models")
 const admin = require("../firebase")
 
+const host = process.env.HOST;
 
 const create = (req) => new Promise(async (resolve, reject) => {
+    const {body, file} = req;
+    const userId = req.user.id;
+
+    const pathFile = file?.path?.split("\\").slice(1).join("/")
+
     try {
-        
+        const notificationInsert = await db.Notification.create({
+            image: pathFile,
+            title: body.title,
+            content: body.content,
+            link: body.link,
+            userId: userId,
+        })
 
         const message = {
             data: {
-              score: '850',
-              time: '2:45'
+                id: notificationInsert.dataValues.id.toString(),
             },
             notification: {
-                title: "Có thông báo mới",
-                body: "hello sas ds ds s sd sd sd",
+                title: notificationInsert.dataValues.title,
+                body: notificationInsert.dataValues.content,
+                imageUrl: `${host}/${notificationInsert.dataValues.image}`
             },
-            topic: process.env.TOPIC
-          };
+            topic: process.env.TOPIC,
+        };
           
-    
         const messagingFirebase = await admin.messaging().send(message)
-
-        console.log("messagingFirebase", messagingFirebase)
     
         resolve({
             erroCode: 0,
             mess: "Thông báo thành công",
+            data: notificationInsert,
         })
     } catch (error) {
         console.log("err", error)
@@ -33,43 +43,38 @@ const create = (req) => new Promise(async (resolve, reject) => {
     }
 })
 
-const getAll = () => new Promise(async (resolve, reject) => {
+const getAll = (req) => new Promise(async (resolve, reject) => {
+    console.log("req", req.query.limit)
     try {
-        const fluctuations = await db.Fluctuation.findAll(
+        const notifications = await db.Notification.findAll(
             {   
+                limit: req.query.limit ? Number(req.query.limit) : undefined,
                 order: [ [ 'createdAt', 'DESC' ]],
-                include: [
-                    {
-                        model: db.Category,
-                        as: "categoryData",
-                        attributes: ["name"]
-                    },
-                ]
             }
         );
+
+        const convertRes = notifications.map(notification => {
+            return {...notification.dataValues, image: `${host}/${notification.dataValues.image}`}
+        })
+
         resolve({
             erroCode: 0,
             mess: "Lấy dữ liệu thành công",
-            data: fluctuations
+            data: convertRes
         })
     } catch (error) {
-        console.log("err", error)
         reject(error)
     }
 })
 
+
 const getDetail = (id) => new Promise(async (resolve, reject) => {
     try {
-        const fluctuationInfor = await db.Fluctuation.findByPk(
+        const notificationInfor = await db.Notification.findByPk(
             id,
             {
-                attributes: ["id", "type" , "amountMoney", "content", "createdAt"],
+                attributes: ["id", "title" , "content", "link", "image", "createdAt"],
                 include: [
-                    {
-                        model: db.Category,
-                        as: "categoryData",
-                        attributes: ["id", "name"]
-                    },
                     {
                         model: db.User,
                         as: "userData",
@@ -82,7 +87,7 @@ const getDetail = (id) => new Promise(async (resolve, reject) => {
         resolve({
             erroCode: 0,
             mess: "Lấy dữ liệu thành công",
-            data: fluctuationInfor
+            data: {...notificationInfor.dataValues, image: `${host}/${notificationInfor.dataValues.image}`}
         })
     } catch (error) {
         reject(error)

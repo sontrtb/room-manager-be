@@ -1,19 +1,31 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
+
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Categories', {
+    await queryInterface.createTable('Notifications', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING
+      userId: {
+        type:  Sequelize.INTEGER,
+        allowNull: false,
       },
-      price: {
-        type: Sequelize.INTEGER
+      title: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      content: {
+        type: Sequelize.TEXT,
+      },
+      link: {
+        type: Sequelize.STRING,
+      },
+      image: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
@@ -24,15 +36,8 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
-
-    return queryInterface.bulkInsert('Categories', [{
-      name: 'Khác...',
-      price: 0,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }]);
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Categories');
+    await queryInterface.dropTable('Notifications');
   }
 };

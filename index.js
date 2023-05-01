@@ -11,6 +11,7 @@ app.use(cors({
     methods: ["GET", "POST", "DELETE", "PUT"]
 }))
 
+app.use(express.static('public'))
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
