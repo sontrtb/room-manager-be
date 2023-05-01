@@ -15,6 +15,12 @@ const getAll = async (req, res) => {
 
 const create = async (req, res) => {
     try {
+        const {title} = req.body;
+        if(!title || title.length ===0) return res.status(400).json({
+            errCode: 1,
+            mess: "Tiêu đề không được để trống"
+        })
+
         const response = await notification.create(req)
         return res.status(200).json(response)
     } catch (error) {
