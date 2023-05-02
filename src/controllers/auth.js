@@ -30,6 +30,7 @@ const login = async (req, res) => {
         })
     
         const response = await auth.login(req.body)
+       
         if(response.erroCode === 1) {
             return res.status(400).json(response)
         }

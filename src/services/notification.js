@@ -25,7 +25,7 @@ const create = (req) => new Promise(async (resolve, reject) => {
             notification: {
                 title: notificationInsert.dataValues.title,
                 body: notificationInsert.dataValues.content,
-                imageUrl: `${host}/${notificationInsert.dataValues.image}`
+                imageUrl: notificationInsert.dataValues.image ? `${host}/${notificationInsert.dataValues.image}` : undefined
             },
             topic: process.env.TOPIC,
         };
@@ -54,7 +54,7 @@ const getAll = (req) => new Promise(async (resolve, reject) => {
         );
 
         const convertRes = notifications.map(notification => {
-            return {...notification.dataValues, image: `${host}/${notification.dataValues.image}`}
+            return {...notification.dataValues, image: notification.dataValues.image ? `${host}/${notification.dataValues.image}`: undefined}
         })
 
         resolve({
@@ -87,7 +87,7 @@ const getDetail = (id) => new Promise(async (resolve, reject) => {
         resolve({
             erroCode: 0,
             mess: "Lấy dữ liệu thành công",
-            data: {...notificationInfor.dataValues, image: `${host}/${notificationInfor.dataValues.image}`}
+            data: {...notificationInfor.dataValues, image: notificationInfor.dataValues.image ? `${host}/${notificationInfor.dataValues.image}` : undefined}
         })
     } catch (error) {
         reject(error)

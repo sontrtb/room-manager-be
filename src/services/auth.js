@@ -85,6 +85,7 @@ const login = ({userName, password, deviceToken}) => new Promise(async (resolve,
             })
         }
     } catch (error) {
+        console.log("error", error)
         reject(error)
     }
 })
